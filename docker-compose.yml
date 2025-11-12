@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  target-webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: target-webapp:latest
+    container_name: target-webapp
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./pdfs:/app/pdfs
+      - ./logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - webapp-net
+
+networks:
+  webapp-net:
+    driver: bridge
+
+volumes:
+  pdfs:
+  logs:
